@@ -5,7 +5,7 @@
 #include <string.h>
 #include <Timer.h>
 
-const uint16_t threshold = 375;
+const uint16_t threshold = 200;
 uint16_t counterL = 0;
 uint16_t counterR = 0;
 
@@ -20,11 +20,11 @@ Zumo32U4IMU imu;
 Zumo32U4OLED display;
 Zumo32U4Encoders encoders;
 
-
 int turnsArray[100];
 uint32_t turnTimeArray[100];
 Vector<int> turnsTaken;
 Vector<uint32_t> turnsTakenTime;
+Vector<int> simplifiedPath;
 
 Timer timer(MILLIS);
 uint32_t prevTime;
@@ -36,11 +36,11 @@ unsigned int prevLineSensorValues[NUM_SENSORS];
 
 bool finished = false;
 bool simplify = false;
-uint8_t targetHouses = 1;  // default number of ghouses we are looking for.
+uint8_t targetHouses = 1; 
 uint8_t foundHouses = 0;
 
-const int DESIRED_LEFT_SPEED = 100;  // change this back to an even number
-const int DESIRED_RIGHT_SPEED = 100;
+const int DESIRED_LEFT_SPEED = 85; 
+const int DESIRED_RIGHT_SPEED = 85;
 int leftEncoderCount = 0;
 int rightEncoderCount = 0;
 
@@ -203,7 +203,7 @@ void setup() {
     }
     if (buttonC.getSingleDebouncedRelease()) {
       if (simplifiedPath.size() > 0) {
-        returnToFinish();
+        //returnToFinish();
       } else {
         simplify = true;
       }
@@ -354,12 +354,12 @@ void turnAround() {
 
 void shiftLeft() {
   motors.setSpeeds(-leftSpeed, rightSpeed);
-  delay(100);  // how long to bear
+  delay(100);  
 }
 
 void shiftRight() {
   motors.setSpeeds(leftSpeed, -rightSpeed);
-  delay(100);  // how long to bear
+  delay(100);  
 }
 
 void resetCounters() {
@@ -502,7 +502,9 @@ void calibrateMotorSpeeds() {
 }
 
 void houseFound(uint32_t prevTime) {
+  buzzer.playFrequency(900, 100, 15);
   if (foundHouses == targetHouses) {
+    buzzer.playFrequency(500, 150, 15);
     finished = true;
     turnsTakenTime.push_back(prevTime);
     turnsTaken.push_back(5);
